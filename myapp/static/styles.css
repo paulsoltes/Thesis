@@ -1,0 +1,77 @@
+/* Full Page Background */
+body {
+  background: url("/static/Images/background.jpg") no-repeat center center fixed;
+  background-size: cover;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Login Box */
+.login-card {
+  background-color: rgba(208, 206, 221, 0.6); /* Maroon with 60% opacity */
+  padding: 50px 30px;
+  border-radius: 25px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  width: 350px;
+  height: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Background Logo inside Login Box */
+.login-card::before {
+  content: "";
+  background: url("../images/logo.png") no-repeat center center;
+  background-size: 350px; /* Adjust size */
+  position: absolute;
+  top: 80px; /* Adjust vertical position */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 350px; /* Match background-size */
+  height: 350px; /* Match background-size */
+  opacity: 0.2; /* Adjust transparency */
+  z-index: 0; /* Stays behind form elements */
+}
+
+/* Logo Centering */
+.logo {
+  width: 100px;
+  margin-bottom: 10px;
+  position: relative;
+  z-index: 1; /* Ensures it's above the background */
+}
+
+/* Input Fields */
+input {
+  background-color: #F5D376; /* Yellow */
+  border: none;
+  padding: 12px;
+  width: 80%;
+  border-radius: 25px;
+  text-align: center;
+  margin: 10px 0;
+  position: relative;
+  z-index: 1; /* Above background */
+}
+
+/* Login Button */
+button {
+  background-color: black;
+  color: white;
+  border: none;
+  padding: 12px;
+  width: 85%;
+  border-radius: 25px;
+  cursor: pointer;
+  margin-top: 15px;
+  position: relative;
+  z-index: 1; /* Above background */
+}

@@ -1,0 +1,1169 @@
+{% load static %}  <!-- Django static files loading -->
+
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<script src="{% static 'js/dashboard.js' %}"></script>
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        const csrfToken = "{{ csrf_token }}";
+    </script>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <!-- Favicon Link -->
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    
+    <style>
+        
+        /* Header Styling */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #5b0e06; /* Dark red */
+            padding: 10px 20px;
+        }
+        .nav-left {
+            display: flex;
+            align-items: center;
+        }
+        .nav-logo {
+            height: 50px; /* Adjust size */
+            width: auto;
+            margin-right: 10px;
+        }
+        .nav-title {
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .nav-right {
+            display: flex;
+            align-items: center;
+            color: white;
+        }
+        .user-role {
+            margin-right: 8px;
+            font-weight: bold;
+        }
+        .fa-user {
+            font-size: 16px;
+        }
+        /* Logout Button */
+        .logout-btn {
+            background-color: white;
+            color: #5b0e06;
+            border: none;
+            padding: 5px 10px;
+            margin-left: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: 0.3s;
+        }
+        .logout-btn:hover {
+            background-color: #ddd;
+        }
+        /* Horizontal Line */
+        .horizontal-line {
+            border: none;
+            height: 3px;
+            background-color: black;
+            margin-top: 10px;
+            width: 100%;
+            display: block;
+        }
+    </style>
+</head>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelector(".add-button").addEventListener("click", addSchedule);
+    });
+    
+    function addSchedule() {
+        let subject = document.getElementById("subject").value;
+        let room = document.getElementById("room").value;
+        let day = document.getElementById("day").value;
+        let startTime = document.getElementById("start-time").value;
+        let endTime = document.getElementById("end-time").value;
+    
+        // Check if all fields are selected
+        if (!subject || !room || !day || !startTime || !endTime) {
+            alert("Please fill in all fields!");
+            return;
+        }
+    
+        // Find the timetable where to add the subject
+        let timetable = document.getElementById("schedule-table"); // Ensure your table has this ID
+        if (!timetable) {
+            alert("Timetable not found!");
+            return;
+        }
+    
+        // Insert the schedule into the table
+        let newRow = timetable.insertRow();
+        newRow.innerHTML = `
+            <td>${subject}</td>
+            <td>${room}</td>
+            <td>${day}</td>
+            <td>${startTime} - ${endTime}</td>
+        `;
+    
+        alert("Schedule added successfully!");
+    }
+    </script>
+    
+<body>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-left">
+            <img src="{% static 'Images/logo.png' %}" alt="Logo" class="nav-logo">
+            <span class="nav-title">Naga College Foundation Inc.</span>
+        </div>
+        <div class="nav-right">
+            <span class="user-role">Dean</span>
+            <i class="fas fa-user"></i>
+            <form action="{% url 'logout' %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="logout-btn">Logout</button>
+            </form>
+        </div>
+    </nav>
+
+    <script src="{% static 'js/script.js' %}"></script>  <!-- Django Static File -->
+
+    <!-- JavaScript for Handling Class Addition -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            document.getElementById("add-class-btn").addEventListener("click", function() {
+                let instructor = document.getElementById("instructor").value;
+                let room = document.getElementById("room").value;
+                let day = document.getElementById("day").value;
+                let startTime = document.getElementById("start-time").value;
+                let endTime = document.getElementById("end-time").value;
+                let course = document.getElementById("course").value;
+                let subject = document.getElementById("subject").value;
+                let year = document.getElementById("year").value;
+                let section = document.getElementById("section").value;
+
+                let formData = {
+                    instructor: instructor,
+                    room: room,
+                    day: day,
+                    start_time: startTime,
+                    end_time: endTime,
+                    course: course,
+                    subject: subject,
+                    year: year,
+                    section: section,
+                    csrfmiddlewaretoken: document.querySelector('[name=csrfmiddlewaretoken]').value
+                };
+
+                fetch("/add-class/", {
+                    method: "POST",
+                    body: JSON.stringify(formData),
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": formData.csrfmiddlewaretoken
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        updateTimetable(data.class_entry);
+                    } else {
+                        alert("Failed to add class. Please try again.");
+                    }
+                });
+            });
+
+            function updateTimetable(classEntry) {
+                let table = document.getElementById("timetable-body"); // ID of your timetable tbody
+                let row = document.createElement("tr");
+
+                row.innerHTML = `
+                    <td>${classEntry.instructor}</td>
+                    <td>${classEntry.room}</td>
+                    <td>${classEntry.day}</td>
+                    <td>${classEntry.start_time} - ${classEntry.end_time}</td>
+                    <td>${classEntry.course}</td>
+                    <td>${classEntry.subject}</td>
+                    <td>${classEntry.year}-${classEntry.section}</td>
+                `;
+
+                table.appendChild(row);
+            }
+        });
+        <!-- Timetable Form Section -->
+        <div class="timetable-container">
+            <h2 style="text-align: center; font-size: 24px;">Time Table</h2>
+            <hr class="horizontal-line">
+            
+            <!-- your entire form goes here... -->
+            
+            <button id="add-class-btn">Add Class</button> <!-- Make sure this button exists -->
+            
+            <table id="timetable">
+                <tbody id="timetable-body">
+                    <!-- Your dynamic rows will go here -->
+                </tbody>
+            </table>
+        </div>
+    
+        <!-- Scripts after the form -->
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const addBtn = document.getElementById("add-class-btn");
+                if (!addBtn) {
+                    console.error("Add class button not found!");
+                    return;
+                }
+    
+                addBtn.addEventListener("click", function () {
+                    let instructor = document.getElementById("instructor").value;
+                    let room = document.getElementById("room").value;
+                    let day = document.getElementById("day").value;
+                    let startTime = document.getElementById("start-time").value;
+                    let endTime = document.getElementById("end-time").value;
+                    let course = document.getElementById("course").value;
+                    let subject = document.getElementById("subject").value;
+                    let year = document.getElementById("year").value;
+                    let section = document.getElementById("section").value;
+    
+                    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
+                    const formData = {
+                        instructor,
+                        room,
+                        day,
+                        start_time: startTime,
+                        end_time: endTime,
+                        course,
+                        subject,
+                        year,
+                        section,
+                        csrfmiddlewaretoken: csrfToken
+                    };
+    
+                    fetch("/add-class/", {
+                        method: "POST",
+                        body: JSON.stringify(formData),
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": csrfToken
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            updateTimetable(data.class_entry);
+                        } else {
+                            alert("Failed to add class");
+                        }
+                    })
+                    .catch(err => console.error("Error:", err));
+                });
+    
+                function updateTimetable(entry) {
+                    const tableBody = document.getElementById("timetable-body");
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                        <td>${entry.instructor}</td>
+                        <td>${entry.room}</td>
+                        <td>${entry.day}</td>
+                        <td>${entry.start_time} - ${entry.end_time}</td>
+                        <td>${entry.course}</td>
+                        <td>${entry.subject}</td>
+                        <td>${entry.year}-${entry.section}</td>
+                    `;
+                    tableBody.appendChild(row);
+                }
+            });
+        </script>
+    </script>
+    <script src="js/dashboard.js"></script>
+
+</body>
+</html>
+
+
+    <!-- Timetable Form Section -->
+    <div class="timetable-container">
+        <h2 style="text-align: center; font-size: 24px;">Time Table</h2>
+
+    <!-- Horizontal Line Below Time Table -->
+    <hr class="horizontal-line">
+        <div class="timetable-form">
+            
+            <!-- Instructor Selection -->
+            <div class="form-group">
+                <label for="instructor">Instructor</label>
+                <select id="instructor" name="instructor">
+                    <option value="">None</option>
+                    <option>Engr. Abiog, Indira Chrisna Maru</option>
+                    <option>Engr. Agna, Niño Angelo T.</option>
+                    <option>Engr. Bautista, Mel Deniel J.</option>
+                    <option>Engr. Burgos, Arwin Albia</option>
+                    <option>Engr. Gonzales, Maricel P.</option>
+                    <option>Engr. Joson, Joshua Rey A.</option>
+                    <option>Engr. Malonda, Joseph</option>
+                    <option>Engr. Nash, Jose B.</option>
+                    <option>Engr. Plazo, Marion Frea A.</option>
+                    <option>Engr. Referiza, Loren G.</option>
+                    <option>Engr. Rellama, Jobi P.</option>
+                    <option>Engr. Roja, Cecille B.</option>
+                    <option>Engr. San Lorenzo, Ariel C.</option>
+                    <option>Engr. Sevilla, Rizamin E.</option>
+                    <option>Engr. Tanay, Daniele Mae Gian B.</option>
+                    <option>Atty. Garchitorena, Liahona A.</option>
+                    <option>Molina, Joel A.</option>
+                </select>
+            </div>
+
+            <!-- Room Selection -->
+            <div class="form-group">
+                <label for="room">Room</label>
+                <select id="room" name="room">
+                    <option value="">None</option>
+                    <option value="ST 110">ST 110</option>
+                    <option value="ST 101">ST 101</option>
+                    <option value="ST 111">ST 111</option>
+                    <option value="ST 112">ST 112</option>
+                    <option value="ST 208">ST 208</option>
+                    <option value="ST 406">ST 406</option>
+                    <option value="ST 407">ST 407</option>
+                    <option value="ST 411">ST 411</option>
+                    <option value="ST 412">ST 412</option>
+                    <option value="ST 413">ST 413</option>
+                </select>
+            </div>
+
+            <!-- Day Selection -->
+            <div class="form-group">
+                <label for="day">Day</label>
+                <select id="day" name="day">
+                    <option value="">None</option>
+                    <option value="MW">Monday-Wednesday</option>
+                    <option value="TTh">Tuesday-Thursday</option>
+                    <option value="FS">Friday-Saturday</option>
+                </select>
+            </div>
+
+            <!-- Time Selection -->
+            <div class="form-group">
+                <label>Time</label>
+                <div class="time-input">
+                    <input type="time" id="start-time" name="start_time">
+                    <span>to</span>
+                    <input type="time" id="end-time" name="end_time">
+                </div>
+            </div>
+            
+
+           <!-- Course Selection -->
+<div class="form-group">
+    <label for="course">Course</label>
+    <select id="course" name="course" onchange="updateSubjects()">
+        <option value="">None</option>
+        <option value="BSCE">BSCE - Civil Engineering</option>
+        <option value="BSCpE">BSCpE - Computer Engineering</option>
+        <option value="BSGE">BSGE - Geodetic Engineering</option>
+    </select>
+</div>
+
+<!-- Subject Selection -->
+<div class="form-group">
+    <label for="subject">Subject</label>
+    <select id="subject" name="subject">
+        <option value="">None</option>
+    </select>
+</div>
+
+<script>
+    function updateSubjects() {
+        let course = document.getElementById("course").value;
+        let subjectDropdown = document.getElementById("subject");
+
+        // Clear existing options
+        subjectDropdown.innerHTML = '<option value="">None</option>';
+
+        // Define subjects for each course
+        const subjects = {
+            "BSCpE": [
+                "CPE 111 Computer Engineering as a Discipline",
+                "CPE 112 Programming Logic and Design",
+                "CPE 211 Data Structures and Algorithm",
+                "CPE 212 Computer – Aided Drafting",
+                "CPE 214 Fundamentals of Electrical Circuits",
+                "CPE 312 Operating System",
+                "CPE 313 Data and Digital Communications",
+                "CPE 314 Feedback and Control Systems",
+                "CPE 315 Fundamentals of Mixed Signals and Sensors",
+                "CPE 316 Introduction to HDL",
+                "CPE 317 Computer Engineering Drafting and Design",
+                "CPE 319 Software Development 1",
+                "CPE 323 CpE Laws and Professional Practice",
+                "CPE 324 Basic Occupational Safety and Health",
+                "CPE 325 System and Network Administration 1",
+                "CPE 411 Embedded System",
+                "CPE 413 Digital Signal Processing",
+                "CPE 414 Emerging Technologies in CpE",
+                "CPE 415 Computer Engineering Practice and Design 1",
+                "CPE 416 System and Network Administration 3"
+            ],
+            "BSCE": [
+                "CE 111 Civil Engineering Orientation",
+                "CE 211 Computer – Aided Drafting",
+                "CE 212 Engineering Data Analysis",
+                "CE 212 Fundamentals of Surveying",
+                "CE 214 Engineering Management",
+                "CE 311 Structural Theory",
+                "CE 313 Engineering Utilities 1",
+                "CE 316 Building Systems Design",
+                "CE 322 Principles of Steel Design",
+                "CE 324 Hydraulics",
+                "CE 411 Reinforced & Prestressed Concrete Design",
+                "CE 412 Design of Steel Structures",
+                "CE 413E Geotechnical Engineering",
+                "CE 414 Construction Method and Project Management",
+                "CE 415E CE Project 1",
+                "CE 417 Environmental Science and Engineering",
+                "CE 421 Foundation & Retaining Wall Design",
+                "CE 422 Earthquake Engineering"
+            ],
+            "BSGE": [
+                "GE 112 Safety Management",
+                "GE 113 Computer Fundamentals and Programming",
+                "GE 115 Computer-Aided Drafting",
+                "GE 116 Introduction to the Laws on Private and Public Land",
+                "GE 213 Theory of Errors & Adjustments",
+                "GE 214 Electrical and Electronics Eng’g for GE",
+                "GE 223 GE Laws, Obligations, Contracts and Ethics",
+                "GE 412 Advance Information Communication Technology",
+                "GE 414 Public Land Laws and Laws on Natural Resources"
+            ]
+        };
+
+        // Common subjects for all courses
+        const commonSubjects = [
+            "MATH 011 College Algebra 1",
+            "MATH 012 Plane and Spherical Trigonometry",
+            "MATH 111 Calculus 1",
+            "MATH 213 Differential Equations",
+            "MATH 315 Numerical Solutions to CE Problems",
+            "GEC 4 Mathematics in the Modern World",
+            "GEC 7 Science, Technology and Society",
+            "GEC 9 Living in the I.T Era",
+            "MECH 211 Engineering Mechanics",
+            "MECH 211 Statics of Rigid Bodies",
+            "MECH 222 Dynamics of Rigid Bodies",
+            "MECH 223 Mechanics of Deformable Bodies"
+        ];
+
+        // Add subjects based on selected course
+        if (course && subjects[course]) {
+            subjects[course].forEach(subj => {
+                let option = document.createElement("option");
+                option.value = subj;
+                option.textContent = subj;
+                subjectDropdown.appendChild(option);
+            });
+
+            // Add common subjects
+            commonSubjects.forEach(subj => {
+                let option = document.createElement("option");
+                option.value = subj;
+                option.textContent = subj;
+                subjectDropdown.appendChild(option);
+            });
+        }
+    }
+    function addSchedule() {
+        let subject = document.getElementById("subject").value;
+        let room = document.getElementById("room").value;
+        let day = document.getElementById("day").value;
+        let startTime = document.getElementById("start_time").value;
+        let endTime = document.getElementById("end_time").value;
+    
+        if (!subject || !room || !day || !startTime || !endTime) {
+            alert("Please fill in all fields!");
+            return;
+        }
+    
+        let table = document.querySelector("table"); // Assuming you have only one table
+        let rows = table.getElementsByTagName("tr");
+    
+        function convertTimeToRowIndex(time) {
+            let [hours, minutes] = time.split(":").map(Number);
+            let index = (hours - 7) + (minutes > 0 ? 0.5 : 0); // Assuming timetable starts at 7:00 AM
+            return index;
+        }
+    
+        let startIndex = convertTimeToRowIndex(startTime) + 1;
+        let endIndex = convertTimeToRowIndex(endTime) + 1;
+    
+        for (let i = Math.floor(startIndex); i <= Math.floor(endIndex); i++) {
+            let cell = rows[i]?.querySelector(`td[data-room="${room}"]`);
+            if (cell) {
+                cell.textContent = subject;
+                cell.style.backgroundColor = "green";
+                cell.style.color = "white";
+    
+                // Handle partial last block
+                if (i === Math.floor(endIndex) && endIndex % 1 !== 0) {
+                    cell.style.opacity = "0.5"; // Partially fill last cell
+                }
+            }
+        }
+    }
+    
+</script>
+
+
+            <!-- Year and Section Selection -->
+            <div class="form-group">
+                <label for="year">Year</label>
+                <select id="year" name="year">
+                    <option value="">None</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="section">Section</label>
+                <select id="section" name="section">
+                    <option value="">None</option>
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                    <option value="C">C</option>
+                    <option value="D">D</option>
+                    <option value="E">E</option>
+                </select>
+            </div>
+
+            <button id="addButton">Add</button>
+           
+
+
+
+            <button class="download-button">&#x1F4E5;</button>
+        </div>
+    </div>
+<!-- Engineering Department Section -->
+<div class="engineering-department">
+    <h2>ENGINEERING DEPARTMENT</h2>
+</div>
+</div>
+
+    </table>
+    <div class="schedule">
+       
+        
+        <h3>Monday / Wednesday</h3>
+       <table id="timetable">
+  <tr>
+    <th>Time</th>
+    <th>ST 101</th>
+    <th>ST 110</th>
+    <th>ST 111</th>
+    <th>ST 112</th>
+    <th>ST 208</th>
+    <th>ST 406</th>
+    <th>ST 407</th>
+    <th>ST 411</th>
+    <th>ST 412</th>
+    <th>ST 413</th>
+  </tr>
+  <tr>
+    <td>7:00am</td>
+    <td></td> <!-- Data should be added here -->
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <!-- More rows below -->
+    <tr>
+
+            </tr>
+            <tr>
+                <td>8:00am</td>
+    <td></td> <!-- Data should be added here -->
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <!-- More rows below -->
+    <tr>
+            <tr>
+                <td>9:00am</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td></td><td></td><td></td><td></td><td></td>
+            </tr>
+            <tr>
+                <td>10:00am</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td></td><td></td><td></td><td></td><td></td>
+            </tr>
+            <tr>
+                <td>11:00am</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td></td><td></td><td></td><td></td><td></td>
+            </tr>
+            <tr>
+                <td>12:00pm</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td></td><td></td><td></td><td></td><td></td>
+            </tr>
+            <tr>
+                <td>1:00pm</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td></td><td></td><td></td><td></td><td></td>
+            </tr>
+            <tr>
+                <td>2:00pm</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td></td><td></td><td></td><td></td><td></td>
+            </tr>
+            <tr>
+                <td>3:00pm</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td></td><td></td><td></td><td></td><td></td>
+            </tr>
+            <tr>
+                <td>4:00pm</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td></td><td></td><td></td><td></td><td></td>
+            </tr>
+            <tr>
+                <td>5:00pm</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td></td><td></td><td></td><td></td><td></td>
+            </tr>
+            <tr>
+                <td>6:00pm</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td></td><td></td><td></td><td></td><td></td>
+            </tr>
+            <tr>
+                <td>7:00pm</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td></td><td></td><td></td><td></td><td></td>
+            </tr>
+            <tr>
+                <td>8:00pm</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td></td><td></td><td></td><td></td><td></td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+    </table>
+            <div class="schedule">
+                <h3>Tuesday / thursday</h3>
+                <table>
+                    <tr>
+                        <th>Time</th>
+                        <th>ST 101</th>
+                        <th>ST 110</th>
+                        <th>ST 111</th>
+                        <th>ST 112</th>
+                        <th>ST 208</th>
+                        <th>ST 406</th>
+                        <th>ST 407</th>
+                        <th>ST 411</th>
+                        <th>ST 412</th>
+                        <th>ST 413</th>
+                    </tr>
+                    <tr>
+                        <td>7:00am</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>8:00am</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>9:00am</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>10:00am</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>11:00am</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>12:00am</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>1:00pm</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>2:00pm</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>3:00pm</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>4:00pm</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>5:00pm</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>6:00pm</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>7:00pm</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>8:00pm</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+        </table>
+    </table>
+    <div class="schedule">
+        <h3>Friday / Saturday</h3>
+        <table>
+            <tr>
+                <th>Time</th>
+                <th>ST 101</th>
+                <th>ST 110</th>
+                <th>ST 111</th>
+                <th>ST 112</th>
+                <th>ST 208</th>
+                <th>ST 406</th>
+                <th>ST 407</th>
+                <th>ST 411</th>
+                <th>ST 412</th>
+                <th>ST 413</th>
+            </tr>
+            <tr>
+                <td>7:00am</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>8:00am</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>9:00am</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>10:00am</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>11:00am</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>12:00am</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>1:00pm</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>2:00pm</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>3:00pm</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>4:00pm</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>5:00pm</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>6:00pm</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>7:00pm</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>8:00pm</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+</table>
+    </div>
+</div>
+
+<style>
+.timetable-container {
+    background: #f8db56;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+}
+.timetable-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+.timetable-form {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+}
+.form-group {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+}
+.form-group label {
+    font-size: 14px;
+    font-weight: bold;
+}
+.form-group select, .form-group input {
+    width: 100%;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+.add-button {
+    background: #2c6e49;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.download-button {
+    background: white;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+}
+.engineering-department {
+    background: maroon;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 20px;
+}
+.schedule {
+    background: white;
+    padding: 15px;
+    border-radius: 5px;
+    text-align: center;
+}
+.schedule h3 {
+    display: inline-block;
+    border: 2px solid black;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+th, td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: center;
+}
+.Monday / Wednesday {
+    color: black !important;
+    font-weight: bold;
+}
+</style>

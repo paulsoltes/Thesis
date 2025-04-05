@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+
+    <!-- Link to external stylesheet -->
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+
+    <!-- Favicon Link -->
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+</head>
+<body>
+
+    <div class="container">
+        <div class="login-card">
+            <!-- Corrected Static Path -->
+            <img src="/static/Images/logo.png" class="logo" alt="College Logo">
+
+
+            <!-- Login Form -->
+            <form method="POST">
+                {% csrf_token %}
+                <input type="text" name="username" placeholder="Username" required>
+                <input type="password" name="password" placeholder="Password" required>
+                <button type="submit">Log in</button>
+            </form>
+            
+            {% if messages %}
+                <ul>
+                    {% for message in messages %}
+                        <li style="color: red;">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Link to external JavaScript -->
+    <script src="{% static 'script.js' %}"></script>
+
+</body>
+</html>

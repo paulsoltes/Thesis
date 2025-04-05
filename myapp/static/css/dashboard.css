@@ -1,0 +1,181 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+/* Header */
+.header {
+    background-color: maroon;
+    color: white;
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    justify-content: space-between;
+}
+
+.header-logo {
+    height: 50px;
+}
+
+/* Account Dropdown */
+.account-info {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    background: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    right: 0;
+    top: 30px;
+}
+
+.dropdown-menu button {
+    width: 100%;
+    border: none;
+    padding: 10px;
+    background: white;
+    cursor: pointer;
+}
+
+.account-info:hover .dropdown-menu {
+    display: block;
+}
+
+.input-container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    border-bottom: 3px solid black; /* Add horizontal line */
+    margin-bottom: 15px; /* Adjust spacing */
+}
+.horizontal-line {
+    border: none;
+    height: 3px;
+    background-color: black;
+    margin-top: 10px;
+    width: 100%;
+    display: block;
+}
+
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.time-input {
+    display: flex;
+    gap: 5px;
+}
+
+/* Buttons */
+#download-btn {
+    background-color: blue;
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+#add-btn {
+    background-color: green;
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+/* Department Title */
+.department-title {
+    background-color: maroon;
+    color: white;
+    padding: 10px;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Timetable Container */
+.timetable-container {
+    margin-top: 20px;
+    border: 1px solid black;
+    padding: 10px;
+    background-color: white;
+}
+
+/* Schedule Heading */
+.schedule h3 {
+    color: black !important;
+    font-weight: bold;
+    display: inline-block;
+    border: 2px solid black;
+    padding: 5px 10px;
+    border-radius: 5px;
+    background-color: white;
+}
+
+/* Monday/Wednesday Label */
+.label-monday-wednesday {
+    color: black !important;
+    font-weight: bold;
+    text-align: center;
+    display: block;
+    margin-top: 5px;
+    font-size: 16px;
+}
+
+/* Timetable Styling */
+.timetable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    border-spacing: 0;
+}
+
+/* Table Header */
+.timetable th {
+    background-color: #ddd;
+    border-right: 1px solid black;
+    padding: 10px;
+    text-align: center;
+}
+
+/* Table Cells */
+.timetable td {
+    padding: 10px;
+    text-align: center;
+    border-right: 1px solid black;
+}
+
+/* Fix for Table Borders */
+.timetable thead tr {
+    border-bottom: 1px solid black;
+}
+
+/* Remove horizontal row lines */
+.timetable tr {
+    border-bottom: none !important;
+}
+
+/* Adjust Table Borders */
+.timetable tbody td {
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+}
+
+/* Remove Right Border for Last Column */
+.timetable td:last-child,
+.timetable th:last-child {
+    border-right: none;
+}
